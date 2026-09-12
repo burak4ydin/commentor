@@ -15,6 +15,7 @@
  *   --keep-license       Keep @license / @preserve comments (default: true)
  *   --no-keep-license    Remove @license / @preserve comments too
  *   --json               Output JSON report instead of text
+ *   --quiet, -q          Suppress per-file output lines (errors still shown)
  *   --stats              Print summary statistics after processing
  *   --version, -v        Print version and exit
  *   --help, -h           Print this help
@@ -52,6 +53,7 @@ try {
       ext:             { type: 'string' },
       'keep-license':  { type: 'boolean', default: true },
       json:            { type: 'boolean', default: false },
+      quiet:           { type: 'boolean', short: 'q', default: false },
       stats:           { type: 'boolean', default: false },
       version:         { type: 'boolean', short: 'v', default: false },
       help:            { type: 'boolean', short: 'h', default: false },
@@ -163,21 +165,21 @@ async function runTargets() {
         extensions,
       })) {
         results.push(r);
-        if (!opts.json && !opts.check) {
+        if (!opts.json && !opts.check && !opts.quiet) {
           printFileResult(r);
         }
       }
     } else {
       const langId = opts.lang ?? getLanguageForFile(abs);
       if (!langId) {
-        if (!opts.json) {
+        if (!opts.json && !opts.quiet) {
           process.stderr.write(`skip  ${abs} — unknown extension\n`);
         }
         continue;
       }
       const r = await stripCommentsFromFile(abs, { write: opts.write, keepLicense, lang: opts.lang });
       results.push(r);
-      if (!opts.json && !opts.check) {
+      if (!opts.json && !opts.check && !opts.quiet) {
         printFileResult(r);
       }
     }
@@ -267,6 +269,7 @@ OPTIONS
       --keep-license    Keep @license / @preserve blocks (default: on)
       --no-keep-license Remove @license / @preserve blocks too
       --json            Output machine-readable JSON report
+  -q, --quiet           Suppress per-file output (errors still shown)
       --stats           Print a summary after processing
   -v, --version         Print version
   -h, --help            Print this help
