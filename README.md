@@ -5,6 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/commentor-cli.svg)](https://www.npmjs.com/package/commentor-cli)
 [![license](https://img.shields.io/npm/l/commentor-cli.svg)](LICENSE)
 [![node](https://img.shields.io/node/v/commentor-cli.svg)](package.json)
+[![tests](https://img.shields.io/badge/tests-70%20passing-brightgreen.svg)](test/strip.test.js)
 
 `commentor` removes every comment from your source files while leaving strings, regex literals, template literals and shebangs completely intact. Supports **25+ languages** with a single, zero-dependency install.
 
@@ -211,6 +212,81 @@ Use `commentor src/` (dry-run) first to review changes. The `--check` flag lets 
 
 **What about JSDoc / TSDoc?**
 They are comments and are removed. If you need to keep them, include `@preserve` in the block (`/** @preserve ... */`).
+
+---
+
+## Real-world examples
+
+### Python script cleanup
+
+```python
+# Before
+import os  # standard library
+
+def get_env(key: str, default: str = "") -> str:
+    """Return env var or default."""  # docstring stays — it's not a comment
+    # fetch from environment
+    return os.environ.get(key, default)  # may return empty string
+```
+
+```python
+# After — commentor --write script.py
+import os
+
+def get_env(key: str, default: str = "") -> str:
+    """Return env var or default."""
+    return os.environ.get(key, default)
+```
+
+### Go package
+
+```go
+// Before
+package main
+
+import "fmt" // stdlib
+
+// main is the entry point.
+func main() {
+    /* greet the world */
+    fmt.Println("hello") // output
+}
+```
+
+```go
+// After — commentor --write main.go
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("hello")
+}
+```
+
+### SQL migration
+
+```sql
+-- Before
+-- drop old table
+DROP TABLE IF EXISTS legacy_users;
+
+-- recreate with new schema
+CREATE TABLE users (
+    id   SERIAL PRIMARY KEY, /* surrogate key */
+    name TEXT NOT NULL       -- display name
+);
+```
+
+```sql
+-- After — commentor --write migration.sql
+DROP TABLE IF EXISTS legacy_users;
+
+CREATE TABLE users (
+    id   SERIAL PRIMARY KEY,
+    name TEXT NOT NULL
+);
+```
 
 ---
 
