@@ -1,0 +1,34 @@
+# dependencies
+node_modules/
+
+# test artifacts
+coverage/
+.nyc_output/
+.tmp-test/
+
+# logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# AI assistant files (never publish)
+.claude/
+CLAUDE.md
+CURRENT_PLAN.md
+PLAN*.md
+AGENTS.md
+GEMINI.md
+.cursor/
+.windsurf/
+.aider*
+.copilot*
+
+# local env & scratch
+.env
+*.bak
+tmp/
+.idea/
+.vscode/
