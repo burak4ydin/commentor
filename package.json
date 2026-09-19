@@ -30,7 +30,7 @@
     ".": "./src/index.js"
   },
   "bin": {
-    "commentor": "./bin/commentor.js"
+    "commentor": "bin/commentor.js"
   },
   "files": [
     "bin/",
