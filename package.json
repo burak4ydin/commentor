@@ -29,6 +29,7 @@
   "exports": {
     ".": "./src/index.js"
   },
+  "types": "./src/index.d.ts",
   "bin": {
     "commentor": "bin/commentor.js"
   },
