@@ -12,6 +12,7 @@
  *   --stdin              Read from stdin; requires --lang
  *   --lang <id>          Force language id (e.g. javascript, python, go)
  *   --ext <.ts,.js>      Only process these extensions (comma-separated)
+ *   --ignore, -i <patterns>  Skip files/dirs matching patterns (comma-separated, e.g. *.test.js,__tests__)
  *   --keep-license       Keep @license / @preserve comments (default: true)
  *   --no-keep-license    Remove @license / @preserve comments too
  *   --json               Output JSON report instead of text
@@ -51,6 +52,7 @@ try {
       stdin:           { type: 'boolean',              default: false },
       lang:            { type: 'string' },
       ext:             { type: 'string' },
+      ignore:          { type: 'string', short: 'i', default: '' },
       'keep-license':  { type: 'boolean', default: true },
       json:            { type: 'boolean', default: false },
       quiet:           { type: 'boolean', short: 'q', default: false },
@@ -110,6 +112,10 @@ const extensions = opts.ext
   ? opts.ext.split(',').map((e) => (e.startsWith('.') ? e.toLowerCase() : '.' + e.toLowerCase()))
   : null;
 
+const ignorePatterns = opts.ignore
+  ? opts.ignore.split(',').map((s) => s.trim()).filter(Boolean)
+  : [];
+
 const keepLicense = opts['keep-license'];
 
 // ────────────────────────────────────────────────────────────────────── main ──
@@ -163,6 +169,7 @@ async function runTargets() {
         write: opts.write,
         keepLicense,
         extensions,
+        ignore: ignorePatterns,
       })) {
         results.push(r);
         if (!opts.json && !opts.check && !opts.quiet) {
@@ -266,6 +273,7 @@ OPTIONS
       --stdin           Read from stdin (requires --lang)
       --lang <id>       Force a language id
       --ext <.ts,.js>   Only process files with these extensions
+  -i, --ignore <patterns>  Skip files/dirs matching patterns (e.g. *.test.js,__tests__)
       --keep-license    Keep @license / @preserve blocks (default: on)
       --no-keep-license Remove @license / @preserve blocks too
       --json            Output machine-readable JSON report
@@ -284,5 +292,6 @@ EXAMPLES
   commentor --stats --write src/   # write + summary
   cat file.py | commentor --stdin --lang python | tee clean.py
   commentor --ext .ts,.tsx --write src/
+  commentor --write --ignore "*.test.js,*.spec.ts,__tests__" src/
 `);
 }
