@@ -10,6 +10,24 @@ import { getLanguageForFile } from './languages.js';
 import { SKIP_DIRS, MAX_FILE_SIZE, BINARY_SNIFF_BYTES } from './constants.js';
 
 /**
+ * Test whether a file or directory name matches any of the ignore patterns.
+ * Patterns support a leading `*` wildcard (e.g. `*.test.js`) or exact names.
+ * @param {string} name  - basename of the file or directory
+ * @param {string[]} patterns - list of patterns
+ * @returns {boolean}
+ */
+function matchesIgnore(name, patterns) {
+  for (const pattern of patterns) {
+    if (pattern.startsWith('*')) {
+      if (name.endsWith(pattern.slice(1))) return true;
+    } else if (name === pattern) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Read bytes from the start of a file to detect binary content.
  * A file is considered binary if the first BINARY_SNIFF_BYTES contain a NUL byte.
  */
@@ -95,6 +113,7 @@ export async function* stripCommentsFromDir(dirPath, options = {}) {
     keepLicense = true,
     extensions = null,
     skipDirs = SKIP_DIRS,
+    ignore = [],
   } = options;
 
   const abs = resolve(dirPath);
@@ -105,6 +124,7 @@ export async function* stripCommentsFromDir(dirPath, options = {}) {
 
     if (entry.isDirectory()) {
       if (skipDirs.has(entry.name)) continue;
+      if (ignore.length > 0 && matchesIgnore(entry.name, ignore)) continue;
       yield* stripCommentsFromDir(fullPath, options);
       continue;
     }
@@ -119,6 +139,8 @@ export async function* stripCommentsFromDir(dirPath, options = {}) {
       const ext = dot >= 0 ? entry.name.slice(dot).toLowerCase() : '';
       if (!extensions.includes(ext)) continue;
     }
+
+    if (ignore.length > 0 && matchesIgnore(entry.name, ignore)) continue;
 
     yield await stripCommentsFromFile(fullPath, { write, keepLicense });
   }

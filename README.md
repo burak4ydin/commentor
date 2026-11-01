@@ -38,6 +38,9 @@ cat file.py | commentor --stdin --lang python
 # Only process certain extensions
 commentor --write --ext .ts,.tsx src/
 
+# Skip test files and __tests__ directories
+commentor --write --ignore "*.test.js,*.spec.ts,__tests__" src/
+
 # Machine-readable JSON report
 commentor --json src/
 
@@ -58,6 +61,7 @@ commentor --no-keep-license --write src/
 | `--stdin` | off | Read from stdin (requires `--lang`) |
 | `--lang <id>` | auto | Force a language id |
 | `--ext <.ts,.js>` | all | Only process these extensions |
+| `--ignore`, `-i` | — | Skip files/dirs matching patterns (e.g. `*.test.js,__tests__`) |
 | `--keep-license` | on | Keep `@license` / `@preserve` blocks |
 | `--no-keep-license` | — | Remove `@license` / `@preserve` blocks |
 | `--json` | off | Output JSON report |
@@ -120,6 +124,14 @@ if (r.changed) console.log(`${r.commentsRemoved} comment(s) removed`);
 for await (const r of stripCommentsFromDir('./src', { write: true })) {
   if (!r.skipped) console.log(r.filePath, r.commentsRemoved);
 }
+
+// Skip test files and __tests__ directories
+for await (const r of stripCommentsFromDir('./src', {
+  write: true,
+  ignore: ['*.test.js', '*.spec.ts', '__tests__'],
+})) {
+  console.log(r.filePath);
+}
 ```
 
 ### `stripComments(code, options)`
@@ -147,6 +159,7 @@ Same options as `stripCommentsFromFile`, plus:
 |--------|------|---------|-------------|
 | `extensions` | `string[]` | all | Filter by extension (e.g. `['.ts', '.js']`) |
 | `skipDirs` | `Set<string>` | built-in | Directory names to skip |
+| `ignore` | `string[]` | `[]` | Skip files/dirs matching patterns (e.g. `['*.test.js', '__tests__']`) |
 
 ---
 
