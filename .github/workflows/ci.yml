@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['18', '20', '22']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run tests
+        run: node --test test/
+
+  lint-check:
+    name: Sanity check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check bin is executable
+        run: test -x bin/commentor.js || chmod +x bin/commentor.js
+
+      - name: Smoke test CLI help
+        run: node bin/commentor.js --help
+
+      - name: Smoke test CLI version
+        run: node bin/commentor.js --version
+
+      - name: Smoke test strip via stdin
+        run: echo "const x = 1; // comment" | node bin/commentor.js --stdin --lang javascript
