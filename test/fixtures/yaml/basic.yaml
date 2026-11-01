@@ -1,0 +1,11 @@
+# Application configuration
+name: my-app  # app name
+
+server:
+  host: localhost  # bind address
+  port: 8080
+
+# Database settings
+database:
+  url: "postgres://localhost/mydb"  # connection string
+  pool: 5
