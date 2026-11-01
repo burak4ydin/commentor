@@ -1,0 +1,18 @@
+/* Reset styles */
+body {
+  margin: 0; /* remove default margin */
+  padding: 0;
+}
+
+/* Typography */
+h1 {
+  font-size: 2rem; /* base heading size */
+  /* color: red; commented out rule */
+  color: #333;
+}
+
+.container {
+  max-width: 1200px;
+  /* center horizontally */
+  margin: 0 auto;
+}
